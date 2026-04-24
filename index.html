@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة كاسر الطوب</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #2c3e50; color: white; }
+        .grid { display: flex; flex-direction: column-reverse; align-items: center; margin-top: 20px; }
+        .row { display: flex; margin: 5px; gap: 10px; }
+        .brick { width: 60px; height: 40px; background: #e67e22; border-radius: 5px; 
+                 display: flex; align-items: center; justify-content: center; 
+                 cursor: pointer; font-size: 20px; border: 2px solid #d35400; }
+        .brick.broken { background: #95a5a6; border-color: #7f8c8d; }
+        .brick.disabled { pointer-events: none; opacity: 0.6; }
+        .gem { color: #f1c40f; }
+        .empty { color: #e74c3c; }
+        #status { margin: 20px; font-size: 24px; font-weight: bold; }
+        button { padding: 10px 20px; font-size: 18px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>لعبة كاسر الطوب 🔨</h1>
+    <div id="status">ابدأ من الصف الأول!</div>
+    
+    <div class="grid" id="gameGrid">
+        </div>
+
+    <br>
+    <button onclick="resetGame()">إعادة اللعب</button>
+
+    <script>
+        const gridElement = document.getElementById('gameGrid');
+        const statusElement = document.getElementById('status');
+        let currentRow = 0;
+        const totalRows = 4;
+        const colsPerRow = 5;
+
+        function createBoard() {
+            gridElement.innerHTML = '';
+            for (let r = 0; r < totalRows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+                rowDiv.id = `row-${r}`;
+                
+                // تحديد مكان الخانة الفاضية عشوائياً في كل صف
+                const emptyIndex = Math.floor(Math.random() * colsPerRow);
+
+                for (let c = 0; c < colsPerRow; c++) {
+                    const brick = document.createElement('div');
+                    brick.className = 'brick' + (r > 0 ? ' disabled' : '');
+                    brick.dataset.row = r;
+                    brick.dataset.isEmpty = (c === emptyIndex);
+                    brick.onclick = () => handleBrickClick(brick);
+                    rowDiv.appendChild(brick);
+                }
+                gridElement.appendChild(rowDiv);
+            }
+        }
+
+        function handleBrickClick(brick) {
+            const row = parseInt(brick.dataset.row);
+            if (row !== currentRow) return;
+
+            if (brick.dataset.isEmpty === "true") {
+                brick.innerHTML = "❌";
+                brick.classList.add('broken');
+                statusElement.innerText = "للأسف! الخانة فاضية. خسرت! 💀";
+                disableAll();
+            } else {
+                brick.innerHTML = "<span class='gem'>💎</span>";
+                brick.classList.add('broken');
+                
+                if (currentRow === totalRows - 1) {
+                    statusElement.innerText = "مبروك! وصلت للقمة وجمعت كل الجواهر! 🏆";
+                    disableAll();
+                } else {
+                    statusElement.innerText = "جميل! اطلع للصف اللي بعده..";
+                    nextRow();
+                }
+            }
+        }
+
+        function nextRow() {
+            // قفل الصف الحالي
+            document.querySelectorAll(`#row-${currentRow} .brick`).forEach(b => b.classList.add('disabled'));
+            // فتح الصف الجديد
+            currentRow++;
+            document.querySelectorAll(`#row-${currentRow} .brick`).forEach(b => b.classList.remove('disabled'));
+        }
+
+        function disableAll() {
+            document.querySelectorAll('.brick').forEach(b => b.classList.add('disabled'));
+        }
+
+        function resetGame() {
+            currentRow = 0;
+            statusElement.innerText = "ابدأ من الصف الأول!";
+            createBoard();
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>
