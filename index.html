@@ -12,87 +12,90 @@
             --accent-gold: #ffcc00;
         }
         
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0; background-color: var(--bg-color); color: white;
+            background-color: var(--bg-color); color: white;
             font-family: sans-serif; display: flex; flex-direction: column;
-            height: 100vh; width: 100vw; overflow: hidden;
+            height: 100vh; width: 100vw; overflow: hidden; /* منع السكرول نهائياً */
         }
 
+        #main-game { 
+            display: none; flex-direction: column; height: 100%; width: 100%; 
+        }
+
+        /* الهيدر خليه صغير */
+        .header { 
+            height: 50px; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; background: #161b22; z-index: 10;
+        }
+        
+        /* اللوحة مرنة جداً */
+        #game-board {
+            flex: 1; 
+            display: flex; flex-direction: column-reverse; 
+            gap: 2px; padding: 10px; width: 100%; max-width: 320px;
+            margin: 0 auto; justify-content: space-evenly; /* توزيع المسافات بالتساوي */
+        }
+
+        .row { 
+            display: grid; grid-template-columns: repeat(5, 1fr); 
+            gap: 4px; opacity: 0.15; pointer-events: none;
+            height: 8%; /* كل صف بياخد 8% من طول اللوحة بس */
+        }
+        .row.active { opacity: 1; pointer-events: auto; }
+
+        .brick {
+            height: 100%; background: linear-gradient(135deg, var(--wood-light), var(--wood-dark));
+            border: 1px solid #3d1c02; border-radius: 4px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 0 #000;
+            font-size: 0.8rem;
+        }
+
+        .brick.correct { background: linear-gradient(135deg, #ffd700, #b8860b) !important; }
+        .brick.wrong { background: #222 !important; box-shadow: none; opacity: 0.7; }
+
+        /* منطقة الأزرار ثابتة ومستحيل تختفي */
+        .controls { 
+            height: 65px; display: flex; gap: 10px; width: 100%; 
+            justify-content: center; align-items: center; 
+            background: #161b22; border-top: 1px solid #30363d;
+            padding-bottom: 5px;
+        }
+        
+        button { 
+            background: var(--accent-gold); color: #000; border: none; 
+            padding: 10px 15px; border-radius: 8px; font-weight: bold; 
+            cursor: pointer; font-size: 0.8rem; flex: 1; max-width: 120px;
+        }
+        .btn-reset { background: #444; color: white; }
+
+        /* شاشة القفل */
         #lock-screen {
             position: fixed; inset: 0; background: var(--bg-color);
             display: flex; justify-content: center; align-items: center; z-index: 2000;
         }
         .login-box {
             background: #161b22; padding: 20px; border-radius: 15px;
-            border: 2px solid var(--accent-gold); text-align: center; width: 80%;
+            border: 2px solid var(--accent-gold); text-align: center; width: 85%;
         }
-        input { padding: 10px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; width: 100%; margin: 10px 0; text-align: center; }
-
-        #main-game { 
-            display: none; flex-direction: column; height: 100%; width: 100%; 
-        }
-
-        .header { 
-            height: 60px; display: flex; flex-direction: column; justify-content: center;
-            align-items: center; background: #161b22; border-bottom: 1px solid #30363d;
-        }
-        
-        #game-board {
-            flex: 1; /* هذا يجعل اللوحة تأخذ كل المساحة المتبقية وتصغر لو لزم الأمر */
-            display: flex; flex-direction: column-reverse; 
-            gap: 2px; padding: 5px; width: 100%; max-width: 320px;
-            margin: 0 auto; justify-content: center;
-        }
-
-        .row { 
-            display: grid; grid-template-columns: repeat(5, 1fr); 
-            gap: 4px; opacity: 0.15; pointer-events: none;
-            flex: 1; max-height: 35px; /* تحديد أقصى ارتفاع للصف */
-        }
-        .row.active { opacity: 1; pointer-events: auto; }
-
-        .brick {
-            height: 100%; min-height: 25px;
-            background: linear-gradient(135deg, var(--wood-light), var(--wood-dark));
-            border: 1px solid #3d1c02; border-radius: 4px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 0 #000;
-            font-size: 0.9rem;
-        }
-
-        .brick.correct { background: linear-gradient(135deg, #ffd700, #b8860b) !important; }
-        .brick.wrong { background: #222 !important; box-shadow: none; opacity: 0.7; }
-
-        .controls { 
-            height: 70px; display: flex; gap: 10px; width: 100%; 
-            justify-content: center; align-items: center; 
-            background: #161b22; border-top: 1px solid #30363d;
-            padding-bottom: env(safe-area-inset-bottom); /* لدعم هواتف الآيفون الحديثة */
-        }
-        
-        button { 
-            background: var(--accent-gold); color: #000; border: none; 
-            padding: 10px 15px; border-radius: 8px; font-weight: bold; 
-            cursor: pointer; font-size: 0.8rem;
-        }
-        .btn-reset { background: #444; color: white; }
+        input { padding: 12px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; width: 100%; margin: 10px 0; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="lock-screen">
         <div class="login-box">
-            <h2 style="color: var(--accent-gold); margin: 0 0 10px 0;">APPLE GAME 🍎</h2>
-            <input type="password" id="pass-input" placeholder="كلمة السر">
-            <button onclick="checkCode()" style="width: 100%;">دخول</button>
+            <h2 style="color: var(--accent-gold); margin-bottom: 10px;">APPLE GAME 🍎</h2>
+            <input type="password" id="pass-input" placeholder="باسورد الدخول">
+            <button onclick="checkCode()" style="max-width: 100%;">دخول</button>
         </div>
     </div>
 
     <div id="main-game">
         <div class="header">
-            <div id="msg" style="color: var(--accent-gold); font-weight: bold; font-size: 0.9rem;">توقع مكان التفاحة! 🍎</div>
+            <div id="msg" style="color: var(--accent-gold); font-weight: bold; font-size: 0.85rem;">توقع مكان التفاحة! 🍎</div>
             <div style="font-size: 0.7rem; color: #888;">المستوى: <span id="lvl-num" style="color: white;">1</span> / 10</div>
         </div>
 
