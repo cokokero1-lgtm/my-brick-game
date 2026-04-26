@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>تحدي التفاحة الخشبية 🍎</title>
+    <title>تحدي التفاحة الخشبية - نسخة مضغوطة 🍎</title>
     <style>
         :root {
             --bg-color: #0b0e14;
@@ -24,45 +24,45 @@
             background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 2000;
         }
         .login-box {
-            background: #161b22; padding: 25px; border-radius: 15px;
+            background: #161b22; padding: 20px; border-radius: 15px;
             border: 2px solid var(--accent-gold); text-align: center;
         }
-        input { padding: 10px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; width: 80%; margin: 15px 0; text-align: center; }
+        input { padding: 10px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; width: 80%; margin: 10px 0; text-align: center; }
 
         #main-game { display: none; width: 100%; flex-direction: column; align-items: center; height: 100%; }
 
         .header { 
-            padding: 10px; text-align: center; width: 100%; 
+            padding: 8px; text-align: center; width: 100%; 
             background: #161b22; border-bottom: 1px solid #30363d;
         }
         
         #game-board {
-            display: flex; flex-direction: column-reverse; gap: 5px; padding: 10px;
-            width: 90vw; max-width: 340px; 
-            flex-grow: 1; justify-content: center; /* يتوسط الشاشة ويترك مساحة للأزرار */
+            display: flex; flex-direction: column-reverse; gap: 4px; padding: 5px;
+            width: 95vw; max-width: 320px; 
+            flex-grow: 1; justify-content: center;
         }
 
-        .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; opacity: 0.2; pointer-events: none; }
+        .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; opacity: 0.15; pointer-events: none; }
         .row.active { opacity: 1; pointer-events: auto; }
 
-        /* شكل الطوبة الخشبية */
+        /* حجم أصغر للطوبة الخشبية */
         .brick {
-            height: 38px; /* تصغير الارتفاع لتظهر الأزرار */
+            height: 28px; /* تم تصغيرها من 38px لضمان الظهور */
             background: linear-gradient(135deg, var(--wood-light), var(--wood-dark));
             border: 1px solid var(--wood-border);
-            border-radius: 4px;
+            border-radius: 3px;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer;
-            box-shadow: inset 0 2px 2px rgba(255,255,255,0.2), 0 3px 0 #000;
-            font-size: 1.2rem;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 0 #000;
+            font-size: 1rem;
             position: relative;
         }
 
-        .brick:active { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
+        .brick:active { transform: translateY(1px); box-shadow: 0 1px 0 #000; }
 
         .brick.correct {
             background: linear-gradient(135deg, #ffd700, #b8860b) !important;
-            box-shadow: 0 0 10px var(--accent-gold);
+            box-shadow: 0 0 8px var(--accent-gold);
         }
 
         .brick.wrong {
@@ -72,14 +72,15 @@
         }
 
         .controls { 
-            padding: 15px; display: flex; gap: 10px; width: 100%; 
+            padding: 10px; display: flex; gap: 10px; width: 100%; 
             justify-content: center; background: #161b22;
+            border-top: 1px solid #30363d;
         }
         
         button { 
             background: var(--accent-gold); color: #000; border: none; 
-            padding: 10px 20px; border-radius: 10px; font-weight: bold; 
-            cursor: pointer; font-size: 0.9rem;
+            padding: 8px 16px; border-radius: 8px; font-weight: bold; 
+            cursor: pointer; font-size: 0.85rem;
         }
         .btn-reset { background: #444; color: white; }
     </style>
@@ -88,7 +89,7 @@
 
     <div id="lock-screen">
         <div class="login-box">
-            <h2 style="color: var(--accent-gold);">دخول المغامرة 🍎</h2>
+            <h2 style="color: var(--accent-gold); margin: 0 0 10px 0;">دخول 🍎</h2>
             <input type="password" id="pass-input" placeholder="كلمة السر">
             <button onclick="checkCode()" style="width: 100%;">دخول</button>
         </div>
@@ -96,8 +97,8 @@
 
     <div id="main-game">
         <div class="header">
-            <div id="msg" style="color: var(--accent-gold); font-weight: bold;">توقع مكان التفاحة! 🍎</div>
-            <div style="font-size: 0.8rem; color: #888;">المستوى: <span id="lvl-num" style="color: white;">1</span> / 10</div>
+            <div id="msg" style="color: var(--accent-gold); font-weight: bold; font-size: 0.9rem;">توقع مكان التفاحة! 🍎</div>
+            <div style="font-size: 0.7rem; color: #888;">المستوى: <span id="lvl-num" style="color: white;">1</span> / 10</div>
         </div>
 
         <div id="game-board"></div>
@@ -151,12 +152,10 @@
             if (brick.classList.contains('correct') || brick.classList.contains('wrong')) return;
 
             if (levelData[r].includes(c)) {
-                // في حالة الخطأ: يظهر الرمز لكن لا يغلق الدور
                 brick.classList.add('wrong'); 
                 brick.innerHTML = '💣'; 
                 msgDisplay.innerText = "فخ! جرب صندوق تاني 💣";
             } else {
-                // في حالة الفوز بالدور
                 brick.classList.add('correct'); 
                 brick.innerHTML = '🍎'; 
                 setTimeout(() => nextLevel(), 300);
