@@ -11,6 +11,7 @@
             --neon-blue: #00f3ff;
             --win-green: #2ecc71;
             --3d-shadow: #b38f00;
+            --bomb-red: #e74c3c;
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,11 +39,11 @@
         }
 
         .header { 
-            height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: #161b22; border-bottom: 1px solid #30363d; flex-shrink: 0;
         }
         
-        .sub-header { font-size: 0.7rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 2px; }
+        .sub-header { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 4px; }
 
         #game-container {
             flex: 1; overflow-y: auto; display: flex; flex-direction: column;
@@ -67,8 +68,20 @@
         }
 
         .brick:active { transform: translateY(2px); box-shadow: 0 2px 0 #000; }
-        .brick.correct { background: var(--win-green) !important; box-shadow: 0 4px 0 #1b7a43; animation: pulse 0.5s; }
-        .brick.wrong { background: #e74c3c !important; box-shadow: 0 4px 0 #822a22; }
+        
+        /* حالة التفاحة */
+        .brick.correct { 
+            background: var(--win-green) !important; 
+            box-shadow: 0 4px 0 #1b7a43; 
+            animation: pulse 0.5s; 
+        }
+
+        /* حالة القنبلة - تم التعديل لتكون ثابتة */
+        .brick.wrong { 
+            background: var(--bomb-red) !important; 
+            box-shadow: 0 4px 0 #822a22; 
+            animation: shake 0.3s;
+        }
 
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -76,19 +89,25 @@
             100% { transform: scale(1); }
         }
 
-        /* منطقة الأزرار الـ 3D المعدلة */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* منطقة الأزرار الـ 3D */
         .controls { 
-            height: 100px; display: flex; gap: 20px; width: 100%; 
+            height: 110px; display: flex; gap: 15px; width: 100%; 
             justify-content: center; align-items: center; 
-            background: #161b22; border-top: 1px solid #30363d;
-            padding-bottom: 20px; flex-shrink: 0;
+            background: #161b22; border-top: 2px solid var(--accent-gold);
+            padding-bottom: 25px; flex-shrink: 0;
         }
         
         .btn-3d {
-            position: relative; padding: 12px 25px; font-size: 1rem; font-weight: bold;
+            position: relative; padding: 12px 20px; font-size: 0.9rem; font-weight: bold;
             color: black; background: var(--accent-gold); border: none; border-radius: 12px;
             box-shadow: 0 6px 0 var(--3d-shadow); cursor: pointer; transition: 0.1s;
-            min-width: 120px; outline: none;
+            min-width: 130px; outline: none;
         }
 
         .btn-3d:active {
@@ -96,8 +115,8 @@
             box-shadow: 0 2px 0 var(--3d-shadow);
         }
 
-        .btn-reset { background: #555; color: white; box-shadow: 0 6px 0 #333; }
-        .btn-reset:active { box-shadow: 0 2px 0 #333; }
+        .btn-reset { background: #444; color: white; box-shadow: 0 6px 0 #222; }
+        .btn-reset:active { box-shadow: 0 2px 0 #222; }
 
         /* شاشة القفل */
         #lock-screen {
@@ -126,7 +145,7 @@
     <div id="main-game" style="display:none; flex-direction: column; height: 100%;">
         <div class="neon-bar"></div>
         <div class="header">
-            <div id="msg" style="color: white; font-weight: bold;">6 تفاحات.. ويستحسن 4 🍎</div>
+            <div id="msg" style="color: white; font-weight: bold; font-size: 1.1rem;">6 تفاحات.. ويستحسن 4 🍎</div>
             <div class="sub-header">المستوى الحالي: <span id="lvl-num">1</span></div>
         </div>
 
@@ -158,11 +177,11 @@
             if (document.getElementById('pass-input').value === SECRET_CODE) {
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('main-game').style.display = 'flex';
-                music.volume = 0.3;
-                music.play().catch(() => console.log("المتصفح منع التشغيل التلقائي"));
+                music.volume = 0.2;
+                music.play().catch(() => console.log("Music blocked by browser"));
                 initGame();
             } else {
-                alert("الباسورد خطأ يا بطل!");
+                alert("الباسورد خطأ!");
             }
         }
 
@@ -190,15 +209,20 @@
 
         function handleBrickClick(r, c) {
             const brick = document.getElementById(`brick-${r}-${c}`);
+            // منع الضغط على مربع تم اختياره مسبقاً
             if (brick.classList.contains('correct') || brick.classList.contains('wrong')) return;
             
             if (levelData[r].includes(c)) {
-                brick.classList.add('wrong'); brick.innerHTML = '💣';
-                msgDisplay.innerText = "انفجرت! حاول تاني 💥";
-                setTimeout(() => initGame(), 1000);
+                // إذا اختار قنبلة: يظهر اللون الأحمر والقنبلة فقط ولا يعيد اللعبة
+                brick.classList.add('wrong'); 
+                brick.innerHTML = '💣';
+                msgDisplay.innerText = "حاول مرة أخرى في نفس الدور! ⚠️";
             } else {
-                brick.classList.add('correct'); brick.innerHTML = '🍎';
-                setTimeout(() => nextLevel(), 300);
+                // إذا اختار تفاحة: يظهر اللون الأخضر وينتقل للدور التالي
+                brick.classList.add('correct'); 
+                brick.innerHTML = '🍎';
+                msgDisplay.innerText = "رائع! استمر.. 🍎";
+                setTimeout(() => nextLevel(), 400);
             }
         }
 
@@ -208,22 +232,19 @@
                 currentRow++;
                 document.getElementById(`row-${currentRow}`).classList.add('active');
                 lvlDisplay.innerText = currentRow + 1;
-                document.getElementById('game-container').scrollBy({ top: -60, behavior: 'smooth' });
+                document.getElementById('game-container').scrollBy({ top: -55, behavior: 'smooth' });
             } else {
                 msgDisplay.innerText = "🏆 فوز ملكي أسطوري!";
-                confettiEffect();
             }
         }
 
         function resetCurrentLevel() {
             const bricks = document.querySelectorAll(`#row-${currentRow} .brick`);
-            bricks.forEach(b => { b.classList.remove('wrong', 'correct'); b.innerHTML = ''; });
-        }
-
-        // تأثير بسيط عند الفوز
-        function confettiEffect() {
-            board.style.boxShadow = "0 0 50px var(--win-green)";
-            setTimeout(() => board.style.boxShadow = "none", 2000);
+            bricks.forEach(b => { 
+                b.classList.remove('wrong', 'correct'); 
+                b.innerHTML = ''; 
+            });
+            msgDisplay.innerText = "تم مسح اختيارات الدور الحالي 🔄";
         }
     </script>
 </body>
