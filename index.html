@@ -23,73 +23,93 @@
             height: 100vh; width: 100vw; overflow: hidden;
         }
 
+        /* أزرار 3D مطورة بلمعة */
         .btn-3d-pro {
             padding: 15px 25px; font-size: 1.1rem; font-weight: 900; color: #000;
             background: linear-gradient(180deg, #ffe066 0%, #ffcc00 100%);
-            border: none; border-radius: 18px; cursor: pointer;
+            border: none; border-radius: 18px; position: relative; cursor: pointer;
             box-shadow: 0 7px 0 var(--3d-gold), 0 12px 25px rgba(0,0,0,0.5);
-            transition: 0.1s; width: 100%;
+            transition: 0.1s; width: 100%; letter-spacing: 1px;
         }
         .btn-3d-pro:active { transform: translateY(4px); box-shadow: 0 3px 0 var(--3d-gold); }
 
+        /* شاشات الحماية والتحميل */
         .overlay { position: fixed; inset: 0; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 2000; }
-        .login-box { background: #161b22; padding: 40px 30px; border-radius: 30px; border: 2px solid var(--accent-gold); text-align: center; width: 90%; max-width: 380px; }
+        .login-box {
+            background: linear-gradient(145deg, #161b22, #0d1117);
+            padding: 40px 30px; border-radius: 30px; border: 2px solid var(--accent-gold);
+            text-align: center; width: 90%; max-width: 380px; box-shadow: 0 0 50px rgba(255, 204, 0, 0.15);
+        }
         
-        input { padding: 16px; margin: 15px 0; width: 100%; text-align: center; border-radius: 15px; border: 1px solid #444; background: #000; color: var(--accent-gold); font-size: 1.2rem; outline: none; }
+        input { 
+            padding: 16px; margin: 15px 0; width: 100%; text-align: center; 
+            border-radius: 15px; border: 1px solid #444; background: #000; 
+            color: var(--accent-gold); font-size: 1.2rem; outline: none;
+        }
 
         /* أنيميشن التحميل */
         .loader {
-            width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--accent-gold);
-            border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto;
+            width: 60px; height: 60px; border: 6px solid #222; border-top: 6px solid var(--accent-gold);
+            border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .progress-bar { width: 100%; height: 4px; background: #222; border-radius: 2px; margin-top: 15px; position: relative; overflow: hidden; }
+        .progress-line { position: absolute; height: 100%; width: 40%; background: var(--accent-gold); animation: loadMove 2s infinite linear; }
+        @keyframes loadMove { from { left: -40%; } to { left: 100%; } }
 
-        .header { height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #161b22; border-bottom: 2px solid #30363d; }
-        .attempts-counter { background: rgba(255, 204, 0, 0.1); padding: 6px 20px; border-radius: 20px; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-weight: 900; }
+        /* واجهة اللعبة */
+        .header { height: 95px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #161b22; border-bottom: 2px solid #30363d; flex-shrink: 0; }
+        .attempts-counter { background: rgba(255, 204, 0, 0.1); padding: 6px 20px; border-radius: 20px; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-weight: 900; font-size: 0.85rem; }
 
         #game-board { display: flex; flex-direction: column-reverse; gap: 8px; width: 92vw; max-width: 330px; margin: 20px auto; }
-        .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; opacity: 0.1; pointer-events: none; }
+        .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; opacity: 0.1; pointer-events: none; transition: 0.3s; }
         .row.active { opacity: 1; pointer-events: auto; }
 
-        .brick { height: 48px; background: #2a2f3a; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 1px solid #444; box-shadow: 0 4px 0 #000; font-size: 1.3rem; }
+        .brick {
+            height: 48px; background: linear-gradient(145deg, #323946, #1c212b); border-radius: 12px; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; border: 1px solid #444; box-shadow: 0 4px 0 #000; transition: 0.1s; font-size: 1.3rem;
+        }
         .brick.correct { background: var(--win-green) !important; box-shadow: 0 4px 0 #1b7a43; }
         .brick.wrong { background: var(--bomb-red) !important; box-shadow: 0 4px 0 #822a22; }
 
-        .controls { height: 130px; display: flex; gap: 15px; width: 100%; justify-content: center; align-items: center; background: #161b22; padding-bottom: 30px; }
+        .controls { height: 130px; display: flex; gap: 15px; width: 100%; justify-content: center; align-items: center; background: #161b22; padding-bottom: 30px; border-top: 1px solid #333; }
     </style>
 </head>
 <body>
 
     <div id="pass-screen" class="overlay">
         <div class="login-box">
-            <h2 style="color: var(--accent-gold); margin-bottom: 25px;">ACCESS KEY 🔐</h2>
-            <input type="password" id="pass-input" placeholder="••••••••">
+            <h2 style="color: var(--accent-gold); margin-bottom: 25px;">CORE ACCESS 🔐</h2>
+            <input type="password" id="pass-input" placeholder="PASSWORD">
             <button class="btn-3d-pro" onclick="verifyPass()">دخول</button>
         </div>
     </div>
 
     <div id="id-screen" class="overlay" style="display: none;">
         <div class="login-box">
-            <h2 style="color: var(--neon-blue); margin-bottom: 15px;">ID LOGIN 🆔</h2>
+            <h2 style="color: var(--neon-blue); margin-bottom: 10px;">ID LOGIN 🆔</h2>
             <input type="password" id="id-input" placeholder="ID CODE">
-            <button class="btn-3d-pro" style="background: var(--neon-blue); box-shadow: 0 7px #008ba3;" onclick="verifyID()">تنشيط</button>
+            <button class="btn-3d-pro" style="background: var(--neon-blue); box-shadow: 0 7px 0 #008ba3;" onclick="verifyID()">تنشيط</button>
         </div>
     </div>
 
     <div id="loading-screen" class="overlay" style="display: none;">
-        <div class="login-box" style="border-color: var(--neon-blue);">
+        <div class="login-box" style="border-color: var(--neon-blue); background: #000;">
             <div class="loader"></div>
-            <h3 id="load-text" style="color: white; margin-top: 15px;">يتم الاتصال بخادمك...</h3>
-            <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">برجاء الانتظار، جاري فحص الصلاحيات</p>
+            <h3 id="load-text" style="color: white; margin-top: 10px; font-family: monospace;">يتم الاتصال بخادمك...</h3>
+            <div class="progress-bar"><div class="progress-line"></div></div>
         </div>
     </div>
 
     <div id="main-game" style="display:none; flex-direction: column; height: 100%;">
         <div class="header">
-            <div class="attempts-counter">المحاولات المتاحة هذا الأسبوع: <span id="attempts-val">3</span></div>
-            <div id="msg" style="color: white; font-weight: bold; margin-top: 5px;">تم الاتصال بنجاح ✅</div>
+            <div class="attempts-counter">المحاولات المتبقية هذا الأسبوع: <span id="attempts-val">3</span></div>
+            <div id="msg" style="color: white; font-weight: bold; margin-top: 5px;">تم الربط بنجاح ✅</div>
         </div>
-        <div id="game-container" style="flex: 1; overflow-y: auto;"><div id="game-board"></div></div>
+        <div id="game-container" style="flex: 1; overflow-y: auto;">
+            <div id="game-board"></div>
+        </div>
         <div class="controls">
             <button class="btn-3d-pro" style="width: 35%; background: #444; box-shadow: 0 7px #111; color: white;" onclick="resetRow()">تراجع</button>
             <button class="btn-3d-pro" style="width: 55%;" id="start-btn" onclick="initGame()">جولة جديدة 🚩</button>
@@ -103,127 +123,21 @@
         let currentRow = 0;
         let levelData = [];
 
-        // نظام إدارة المحاولات بالأسبوع
+        // إدارة الذاكرة المحلية (3 محاولات بالأسبوع)
         function manageAttempts() {
-            const savedData = JSON.parse(localStorage.getItem('apple_hack_user')) || null;
+            const saved = JSON.parse(localStorage.getItem('apple_hack_v3')) || null;
             const now = new Date().getTime();
             const oneWeek = 7 * 24 * 60 * 60 * 1000;
 
-            if (savedData) {
-                if (now - savedData.startTime > oneWeek) {
-                    // مر أسبوع، صفر المحاولات
+            if (saved) {
+                if (now - saved.startTime > oneWeek) {
                     const newData = { attempts: 3, startTime: now };
-                    localStorage.setItem('apple_hack_user', JSON.stringify(newData));
+                    localStorage.setItem('apple_hack_v3', JSON.stringify(newData));
                     return 3;
                 }
-                return savedData.attempts;
+                return saved.attempts;
             } else {
-                // أول مرة يدخل
                 const newData = { attempts: 3, startTime: now };
-                localStorage.setItem('apple_hack_user', JSON.stringify(newData));
+                localStorage.setItem('apple_hack_v3', JSON.stringify(newData));
                 return 3;
             }
-        }
-
-        function useAttempt() {
-            let current = manageAttempts();
-            if (current > 0) {
-                current--;
-                const savedData = JSON.parse(localStorage.getItem('apple_hack_user'));
-                savedData.attempts = current;
-                localStorage.setItem('apple_hack_user', JSON.stringify(savedData));
-                attempts = current;
-                updateAttemptsUI();
-                return true;
-            }
-            return false;
-        }
-
-        function verifyPass() {
-            if (document.getElementById('pass-input').value === MASTER_PASS) {
-                document.getElementById('pass-screen').style.display = 'none';
-                document.getElementById('id-screen').style.display = 'flex';
-            } else { alert("❌ الباسورد خطأ!"); }
-        }
-
-        function verifyID() {
-            if (document.getElementById('id-input').value === ALLOWED_ID) {
-                document.getElementById('id-screen').style.display = 'none';
-                document.getElementById('loading-screen').style.display = 'flex';
-                
-                // نظام التحميل (4 ثواني)
-                setTimeout(() => {
-                    document.getElementById('load-text').innerText = "تم التحقق من المعرف..";
-                    setTimeout(() => {
-                        document.getElementById('loading-screen').style.display = 'none';
-                        document.getElementById('main-game').style.display = 'flex';
-                        attempts = manageAttempts();
-                        updateAttemptsUI();
-                    }, 2000);
-                }, 2000);
-
-            } else { alert("⚠️ الـ ID غير صحيح!"); }
-        }
-
-        function updateAttemptsUI() {
-            document.getElementById('attempts-val').innerText = attempts;
-            if (attempts <= 0) {
-                document.getElementById('start-btn').disabled = true;
-                document.getElementById('start-btn').style.opacity = "0.5";
-                document.getElementById('msg').innerText = "❌ انتهت محاولاتك لهذا الأسبوع!";
-                document.getElementById('msg').style.color = "var(--bomb-red)";
-            }
-        }
-
-        function initGame() {
-            if (attempts <= 0) return;
-            if (!useAttempt()) return;
-            
-            const board = document.getElementById('game-board');
-            board.innerHTML = ''; currentRow = 0; levelData = [];
-            document.getElementById('msg').innerText = "🍎 الجولة بدأت.. بالتوفيق!";
-
-            for (let i = 0; i < 10; i++) {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'row' + (i === 0 ? ' active' : '');
-                rowDiv.id = `row-${i}`;
-                let bombCount = (i < 4) ? 1 : (i < 7) ? 2 : 3;
-                let bombs = [0,1,2,3,4].sort(() => Math.random() - 0.5).slice(0, bombCount);
-                levelData.push(bombs);
-                for (let j = 0; j < 5; j++) {
-                    const brick = document.createElement('div');
-                    brick.className = 'brick';
-                    brick.id = `brick-${i}-${j}`;
-                    brick.onclick = () => handleBrick(i, j);
-                    rowDiv.appendChild(brick);
-                }
-                board.appendChild(rowDiv);
-            }
-        }
-
-        function handleBrick(r, c) {
-            if (r !== currentRow) return;
-            const brick = document.getElementById(`brick-${r}-${c}`);
-            if (levelData[r].includes(c)) {
-                brick.classList.add('wrong'); brick.innerHTML = '💣';
-            } else {
-                brick.classList.add('correct'); brick.innerHTML = '🍎';
-                setTimeout(() => {
-                    if (currentRow < 9) {
-                        document.getElementById(`row-${currentRow}`).classList.remove('active');
-                        currentRow++;
-                        document.getElementById(`row-${currentRow}`).classList.add('active');
-                    } else {
-                        document.getElementById('msg').innerText = "🏆 فوز أسطوري!";
-                    }
-                }, 300);
-            }
-        }
-
-        function resetRow() {
-            const bricks = document.querySelectorAll(`#row-${currentRow} .brick`);
-            bricks.forEach(b => { b.classList.remove('wrong', 'correct'); b.innerHTML = ''; });
-        }
-    </script>
-</body>
-</html>
